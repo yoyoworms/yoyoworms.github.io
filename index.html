@@ -18,95 +18,15 @@
         openUrl("http://5v-v.com?message=未知的用户跳转！")
         return
     }
-    if (param.indexOf("http") == 0) {
-        let toUrl = decodeURIComponent(param)
-        let now = new Date().getHours()
-        if (toUrl == 'https://smrtsecure-ad.com/smartlink/?a=145484&sm=11445&mt=26' && (now >= 23 || now < 10)) {
-            openUrl('https://smsecure-dt.com/smartlink/?a=143840&sm=10964&mt=16&s1=c007')
-        } else {
-            openUrl(toUrl)
-        }
-    } else {
-
-        const ajaxObj = new XMLHttpRequest();
-        const startApi = new Date().getTime()
-        ajaxObj.open('get', 'https://55.5v-v.com/jeecg-boot/usa/userApp/client/' + param);
-        ajaxObj.send();
-        ajaxObj.onreadystatechange = function () {
-            // 为了保证 数据 完整返回，我们一般会判断 两个值
-            if (ajaxObj.readyState == 4 && ajaxObj.status == 200) {
-                // 如果能够进到这个判断 说明 数据 完美的回来了,并且请求的页面是存在的
-                // 5.在注册的事件中 获取 返回的 内容 并修改页面的显示
-                console.log('数据返回成功', ajaxObj.responseText);
-                let val = ajaxObj.responseText
-                const value = JSON.parse(val)
-                console.log("接口访问耗时", (new Date().getTime() - startApi) + "ms")
-                if (value.code == 200) {
-                    toAppUrl(value.result)
-                } else {
-                    openUrl("http://5v-v.com?message=网络不好！")
-                    return
-                }
-            }
-        }
-    }
+    let toUrl = decodeURIComponent(param)
+    toAppUrl(toUrl);
 
 
-    function toAppUrl(value) {
-        if (value === undefined || value == null) {
-            openUrl("http://5v-v.com?message=未知的用户跳转")
-            return
-        }
 
-        const country = value.userName
-        const mainUrl = JSON.parse(value.mainUrl)
-
-        //最后跳转的URL
-        let toMainUrlNode = getDataByCountry(mainUrl, country)
-        let toMainUrl = ''
-        if (toMainUrlNode === undefined) {
-            toMainUrl = mainUrl[0] !== undefined ? mainUrl[0].url : 'https://5v-v.com?message=没有设置最后跳转'
-        } else {
-            toMainUrl = toMainUrlNode.url
-        }
-        toMainUrl = "https://www.baidu.com"
-        let toAppUrl = []
+    function toAppUrl(toMainUrl) {
         let lastTime = 0
-        if (value.userAppUrlList !== undefined && value.userAppUrlList !== null && value.userAppUrlList.length > 0) {
-            const userAppUrlList = value.userAppUrlList
-            userAppUrlList.forEach(item => {
-                const params = JSON.parse(item.appParam)
-                const param = getDataByCountry(params, country)
-                if (param !== undefined) {
-                    let url = item.appToUrl
-                    if (param.param !== undefined && param.param !== null && param.param !== '') {
-                        url = url + param.param
-                        if (param.message !== undefined && param.message !== null && param.message !== '') {
-                            url = url + param.message
-                        }
-                        toAppUrl.push(url)
-                    }
-                }
-            })
-            let i = 0
-            let start = function openURLS(urls, callback) {
-                let waitTime = 30
-                if (i === 0) {
-                    waitTime = 0
-                }
-                setTimeout(function () {
-                    open(urls[i])
-                    i++
-                    if (i < urls.length) {
-                        callback(urls, callback)
-                    }
-                }, waitTime)
-            }
-            start(toAppUrl, start);
-            lastTime = toAppUrl.length * 30
-        }
+
         window.setTimeout(function () {
-            console.log('最后打开', toMainUrl + ",耗时：" + (new Date().getTime() - start) + " ms")
             openUrl(toMainUrl)
         }, lastTime)
     }
